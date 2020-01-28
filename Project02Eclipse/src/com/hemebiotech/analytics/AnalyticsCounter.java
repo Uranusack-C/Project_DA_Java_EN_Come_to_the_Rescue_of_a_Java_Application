@@ -1,43 +1,43 @@
 package com.hemebiotech.analytics;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.util.*;
+import java.util.stream.Stream;
 
-public class AnalyticsCounter {
-	private static int headacheCount = 0;	// initialize to 0
-	private static int rashCount = 0;		// initialize to 0
-	private static int pupilCount = 0;		// initialize to 0
-	
-	public static void main(String args[]) throws Exception {
-		// first get input
-		BufferedReader reader = new BufferedReader (new FileReader("symptoms.txt"));
-		String line = reader.readLine();
+/**
+ * @author Uraa
+ * Count all occurence of symptoms and put it on a Map
+ */
+public class AnalyticsCounter
+{
+	/**
+	 * 
+	 * @param allSymptoms
+	 * 		List of all symptoms (duplicate)
+	 * @return 
+	 * 		Map of symptoms (no duplicate) + occurence
+	 *  
+	 */
+	public static Map<String, Long> CountOccurence(List<String> allSymptoms)
+	{
+		Set<String> mySet			= new HashSet<>(allSymptoms);
+		List<String> simpleSymptoms	= new ArrayList<>(mySet);
 
-		int i = 0;	// set i to 0
-		int headCount = 0;	// counts headaches
-		while (line != null) {
-			i++;	// increment i
-			System.out.println("symptom from file: " + line);
-			if (line.equals("headache")) {
-				headCount++;
-				System.out.println("number of headaches: " + headCount);
-			}
-			else if (line.equals("rush")) {
-				rashCount++;
-			}
-			else if (line.contains("pupils")) {
-				pupilCount++;
-			}
+		String tabSymptoms[]		= new String[allSymptoms.size()];
+		tabSymptoms					= allSymptoms.toArray(tabSymptoms);
 
-			line = reader.readLine();	// get another symptom
+		Map<String, Long>	all		= new HashMap<String, Long>();
+		try
+		{
+			for (int i = 0; i < simpleSymptoms.size(); i++)
+			{
+				final int FINALI = i;
+				all.put(simpleSymptoms.get(i), Stream.of(tabSymptoms).filter(e -> e.equals(simpleSymptoms.get(FINALI))).count());
+			}
 		}
-		
-		// next generate output
-		FileWriter writer = new FileWriter ("result.out");
-		writer.write("headache: " + headacheCount + "\n");
-		writer.write("rash: " + rashCount + "\n");
-		writer.write("dialated pupils: " + pupilCount + "\n");
-		writer.close();
+		catch (Exception e)
+		{
+			
+		}
+		return all;
 	}
 }
